@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/3.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
-
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-q+4*wm*8060$p#ni4#)z(6(&i!_q$l#*6$vki&or1l+5xvb5_l
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', 'serene-tor-52305.herokuapp.com']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'serene-tor-52305.herokuapp.com']
 
 
 # Application definition
@@ -48,7 +48,10 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
+
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 ROOT_URLCONF = 'devpro.urls'
 
@@ -74,12 +77,32 @@ WSGI_APPLICATION = 'devpro.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
-DATABASES = {
+
+database_url = os.environ.get('DATABASE_URL')
+if database_url is None:
+    DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
+        }
     }
-}
+
+else:
+    database_url = database_url = database_url.replace('postgres://', '')
+    credenciais, url = database_url.split('@')
+    usuario, senha = credenciais.split(':')
+    dominio_porta, banco_de_dados = url.split('/')
+
+    DATABASES ={
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'NAME': banco_de_dados,
+            'USER': usuario,
+            'PASSWORD': senha,
+            'HOST': host,
+            'PORT': port,
+        }
+    }
 
 
 # Password validation
@@ -119,6 +142,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = str(BASE_DIR / 'staticfiles')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
