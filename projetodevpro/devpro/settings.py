@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-q+4*wm*8060$p#ni4#)z(6(&i!_q$l#*6$vki&or1l+5xvb5_l
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'serene-tor-52305.herokuapp.com']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'radiant-dusk-37015.herokuapp.com']
 
 
 # Application definition
@@ -79,20 +79,21 @@ WSGI_APPLICATION = 'devpro.wsgi.application'
 
 
 database_url = os.environ.get('DATABASE_URL')
+
 if database_url is None:
     DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
         }
     }
 
 else:
-    database_url = database_url = database_url.replace('postgres://', '')
+    database_url = database_url.replace('postgres://', '')
     credenciais, url = database_url.split('@')
     usuario, senha = credenciais.split(':')
     dominio_porta, banco_de_dados = url.split('/')
-
+    host, port = dominio_porta.split(':')
     DATABASES ={
         'default': {
             'ENGINE': 'django.db.backends.postgresql_psycopg2',
@@ -103,7 +104,6 @@ else:
             'PORT': port,
         }
     }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
